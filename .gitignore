@@ -115,3 +115,7 @@ ENV/
 bibliostratus/30000 alignements - temps de traitement
 *.xlsx
 !Controles_editeurs_(test_1-35).xlsx
+
+# Misc
+.DS_Store
+bibliostratus_codebase.md

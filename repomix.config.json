@@ -20,7 +20,7 @@
   "ignore": {
     "useGitignore": true,
     "useDefaultPatterns": true,
-    "customPatterns": ["**/*.csv", "*.csv"]
+    "customPatterns": ["**/*.csv", "*.csv", "**/*.iso", "**/*.xsl"]
   },
   "security": {
     "enableSecurityCheck": true
