@@ -1,0 +1,426 @@
+(.venv) User@MacBook-Pro bibliostratus % codex
+
+╭────────────────────────────────────────────────────────╮
+│ >_ OpenAI Codex (v0.38.0)                              │
+│                                                        │
+│ model:     gpt-5-codex   /model to change              │
+│ directory: ~/Downloads/bibliostratus                   │
+╰────────────────────────────────────────────────────────╯
+
+  To get started, describe a task or try one of these commands:
+
+  /init - create an AGENTS.md file with instructions for Codex
+  /status - show current session configuration
+  /approvals - choose what Codex can do without approval
+  /model - choose what model and reasoning effort to use
+
+▌ Handle all file paths in all .py scripts in bibliostratus/bibliostratus with resource_path from bibliostratus/_resources.py. Overhaul all code in .py
+▌ scripts that has to do with handling file paths in dev vs in bundle, and on Windows vs Mac, so that compilation & dev work both on Windows & Mac, in dev and
+▌ in bundle. FYI: we use pyinstaller to build the app with the following command: ````
+▌ (bibliostratus) User@MacBook-Pro bibliostratus % pyinstaller \
+▌   main.py \
+▌   --name Bibliostratus \
+▌   --windowed \
+▌   --onedir \
+▌   --clean \
+▌   --log-level DEBUG \
+▌   --debug all \
+▌   --add-data "repo_main/files:repo_main/files" \
+▌   --add-data "repo_main/examples:repo_main/examples" \
+▌   --icon "icons/bibliostratus.icns"
+▌ ```
+
+• Explored
+  └ List ls
+    List bibliostratus
+    Read _resources.py
+    Search *.py in bibliostratus
+    Search os\.path in bibliostratus
+    Search Path in bibliostratus
+    Read main.py
+    Search repo_main in bibliostratus
+    Read edit_preferences.py
+    Search resource_path in bibliostratus
+    Read funcs.py
+    Search __file__ in main.py
+    Search __file__ in funcs.py
+    Search __file__ in bibliostratus
+    Search icons/ in bibliostratus
+    Search open\( in bibliostratus
+
+• I’m focused on updating all Python scripts inside the bibliostratus package to handle file paths via the resource_path function from _resources.py, ensuring
+  cross-OS compatibility and consistent behavior in both dev and bundled environments. This involves switching all direct file path manipulations—like in
+  main.py for preferences and images—and adjusting resource_path to robustly handle different OS and PyInstaller bundle structures. I’ll systematically check
+  main.py and forms.py for path usage to replace with resource_path where needed.
+
+• Explored
+  └ Read forms.py
+
+• I'm mapping out a multi-step update to replace direct file system path usage with resource_path across several modules. Since this affects many files, I'll
+  first audit current path handling, then implement changes methodically, and finally run tests to catch any issues. This plan will help keep the refactor
+  organized and safe.
+
+• Updated Plan
+  └ □ Review path handling in bibliostratus package; identify required updates for resource_path usage and cross-platform support.
+    □ Modify modules to route internal file references through resource_path and simplify dev/bundle handling.
+    □ Smoke-check by running targeted commands (e.g., lint/import) and summarize changes.
+
+• Explored
+  └ Search unicode_table in bibliostratus
+
+• Updated Plan
+  └ ✔ Review path handling in bibliostratus package; identify required updates for resource_path usage and cross-platform support.
+    □ Modify modules to route internal file references through resource_path and simplify dev/bundle handling.
+    □ Smoke-check by running targeted commands (e.g., lint/import) and summarize changes.
+
+• I'm updating _resources.py to make resource_path handle absolute paths properly by returning them directly. I'll keep the base path resolution from the
+  script's location and consider PyInstaller packaging quirks like _MEIPASS. This should help resource loading work smoothly whether running from source or a
+  packaged app. I'll use apply_patch to do this carefully.
+
+• Edited bibliostratus/_resources.py (+22 -6)
+    1      # bibliostratus/_resources.py
+    2     +from __future__ import annotations
+    3     +
+    4      from pathlib import Path
+    ⋮
+    6
+    7     +
+    8     +def _base_path() -> Path:
+    9     +    """Return the root directory for bundled resources."""
+    10    +    meipass = getattr(sys, "_MEIPASS", None)
+    11    +    if meipass:
+    12    +        return Path(meipass)
+    13    +    return Path(__file__).resolve().parent
+    14    +
+    15    +
+    16     def resource_path(rel_path: str | Path) -> str:
+    17    +    """Return an absolute path to a bundled resource.
+    18    +
+    19    +    The helper mirrors PyInstaller's runtime layout so a single code path works
+    20    +    both in development (when files live next to the sources) and once bundled
+    21    +    (where they reside under ``sys._MEIPASS``). Absolute inputs are returned as-is
+    22    +    to keep compatibility with user-provided locations.
+    23         """
+    7     -    Return an absolute path to a bundled resource.
+    8     -    - In a PyInstaller app, sys._MEIPASS points at .../Contents/Resources on macOS.
+    9     -    - In dev, it falls back to this file's directory.
+    10    -    """
+    11    -    base = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
+    12    -    return str((base / rel_path).resolve())
+    24    +
+    25    +    rel_path = Path(rel_path)
+    26    +    if rel_path.is_absolute():
+    27    +        return str(rel_path)
+    28    +    return str((_base_path() / rel_path).resolve())
+
+• I'm revising load_preferences to return the actual preferences file path used, defaulting sensibly if none exist, while also updating all hardcoded file
+  paths like in tk.PhotoImage to use resource_path. I'll track down every occurrence of 'repo_main/files/' in main.py to ensure consistent path handling and
+  update the global prefs_file_name accordingly.
+
+• Explored
+  └ Search prefs_file_name in main.py
+    Search repo_main/files in main.py
+
+• Edited bibliostratus/main.py (+18 -19)
+    12     import codecs
+    13    -import os
+    13     import json
+    14     import re
+    15    +import os
+    16     #from pkg_resources import py2_warn
+    ⋮
+    45     def load_preferences():
+    46    -    current_dir = os.path.abspath(__file__)
+    47    -    if "/" in current_dir:
+    48    -        current_dir = "/".join(current_dir.split("/")[:-1])
+    49    -    elif "\\" in current_dir:
+    50    -        current_dir = "\\".join(current_dir.split("\\")[:-1])
+    51    -    prefs_file_name = os.path.join(current_dir, 'repo_main/files/preferences.json')
+    52    -    try:
+    53    -        with open(prefs_file_name, encoding="utf-8") as prefs_file:
+    54    -            prefs = json.load(prefs_file)
+    55    -    except FileNotFoundError:
+    46    +    """Load user preferences with a bundled fallback."""
+    47    +
+    48    +    candidates = [
+    49    +        resource_path("repo_main/files/preferences.json"),
+    50    +        resource_path("repo_main/files/preferences.default"),
+    51    +    ]
+    52    +
+    53    +    for candidate in candidates:
+    54             try:
+    57    -            prefs_file_name = os.path.join(current_dir, 'repo_main/files/preferences.default')
+    58    -            with open(prefs_file_name, encoding="utf-8") as prefs_file:
+    59    -                prefs = json.load(prefs_file)
+    55    +            with open(candidate, encoding="utf-8") as prefs_file:
+    56    +                return json.load(prefs_file), candidate
+    57             except FileNotFoundError:
+    61    -            prefs = {}
+    62    -    return prefs, prefs_file_name
+    58    +            continue
+    59    +
+    60    +    # No preference file was found but keep the expected output path
+    61    +    return {}, candidates[0]
+    62
+    ⋮
+    360        try:
+    362   -        form.iconbitmap(r'repo_main/files/favicon.ico')
+    361   +        form.iconbitmap(resource_path("repo_main/files/favicon.ico"))
+    362        except tk.TclError:
+    ⋮
+    406        try:
+    408   -        master.iconbitmap(r'repo_main/files/favicon.ico')
+    407   +        master.iconbitmap(resource_path("repo_main/files/favicon.ico"))
+    408        except tk.TclError:
+    ⋮
+    783                 bg=couleur_fond, font="Arial 8 normal").pack()
+    785   -    edit_settings_img = tk.PhotoImage(file='repo_main/files/settings.png')
+    784   +    edit_settings_img = tk.PhotoImage(file=resource_path("repo_main/files/settings.png"))
+    785        edit_settings_button = tk.Button(frame_help_cancel,
+
+• Explored
+  └ Search repo_main/files in main.py
+    Read edit_preferences.py
+    Search repo_main/files in edit_preferences.py
+
+• Edited bibliostratus/edit_preferences.py (+4 -4)
+    197    if __name__ == "__main__":
+    198   -    prefs_file_name = 'repo_main/files/preferences.json'
+    199   -    if not(os.path.isfile(prefs_file_name)):
+    200   -        prefs_file_name = 'repo_main/files/preferences.default'
+    201   -    formulaire_main(prefs_file_name, True, [0, False])
+    198   +    prefs_file_name = resource_path("repo_main/files/preferences.json")
+    199   +    if not os.path.isfile(prefs_file_name):
+    200   +        prefs_file_name = resource_path("repo_main/files/preferences.default")
+    201   +    formulaire_main(prefs_file_name, True, [0, False])
+
+• I'm planning to replace hardcoded file paths with resource_path across the code, ensuring fallback to default preferences if the main file is missing.
+  I'll carefully update funcs.py to loop over preference files and handle stop_words paths by trying both direct and resource-based access. Also, spots using
+  os.path.dirname(__file__) will be switched to resource_path for consistency. This approach should improve robustness when files are bundled.
+
+• Explored
+  └ Read funcs.py, forms.py
+    Search "link" in forms.py
+    Search os\. in forms.py
+
+• I'm updating open_local_file to always use resource_path so it properly resolves paths on all platforms, adjusting fallback logic for bundled apps
+  accordingly. I'll also revise config and stop words loading to open files through resource_path with safe fallback loops and use context managers to ensure
+  files close properly. This cleanup will streamline resource access and remove obsolete code.
+
+• Edited bibliostratus/funcs.py (+22 -15)
+    11     import re
+    12    -import os
+    12     import csv
+    ⋮
+    50     stop_words = []
+    52    -try:
+    53    -    with open('repo_main/files/preferences.json', encoding="utf-8") as prefs_file:
+    54    -        prefs = json.load(prefs_file)
+    55    -except FileNotFoundError:
+    56    -    pass
+    51    +for candidate in (
+    52    +    "repo_main/files/preferences.json",
+    53    +    "repo_main/files/preferences.default",
+    54    +):
+    55    +    try:
+    56    +        with open(resource_path(candidate), encoding="utf-8") as prefs_file:
+    57    +            prefs = json.load(prefs_file)
+    58    +        break
+    59    +    except FileNotFoundError:
+    60    +        continue
+    61
+    ⋮
+    65         and prefs["stop_words"]["value"]):
+    62    -    try:
+    63    -        stop_words_file = open(prefs["stop_words"]["value"], "r", encoding="utf-8")
+    64    -        for row in stop_words_file:
+    65    -            word = row.replace("\r", "").replace("\n", "").split("\t")[0]
+    66    -            word = udecode(word.lower())
+    67    -            stop_words.append(word)
+    68    -        stop_words_file.close()
+    69    -    except FileNotFoundError:
+    70    -        pass
+    66    +    stop_words_locations = [prefs["stop_words"]["value"]]
+    67    +    stop_words_locations.append(resource_path(prefs["stop_words"]["value"]))
+    68    +    for candidate in stop_words_locations:
+    69    +        try:
+    70    +            with open(candidate, "r", encoding="utf-8") as stop_words_file:
+    71    +                for row in stop_words_file:
+    72    +                    word = row.replace("\r", "").replace("\n", "").split("\t")[0]
+    73    +                    word = udecode(word.lower())
+    74    +                    stop_words.append(word)
+    75    +            break
+    76    +        except FileNotFoundError:
+    77    +            continue
+    78
+
+• Explored
+  └ Read funcs.py
+
+• Edited bibliostratus/funcs.py (+1 -0)
+    11     import re
+    12    +import os
+    13     import csv
+
+• Edited bibliostratus/funcs.py (+6 -6)
+    831    def open_local_file(path):
+    832   -    """Construit le chemin absolu vers un fichier en local
+    833   -    Permet d'être correct à la fois en mode "code source"
+    834   -    et en version précompilée """
+    835   -    dirname = os.path.dirname(__file__)
+    836   -    filepath = os.path.join(dirname, path)
+    832   +    """Open a bundled resource regardless of execution context."""
+    833   +
+    834   +    filepath = resource_path(path)
+    835        try:
+    ⋮
+    837        except FileNotFoundError:
+    840   -        filepath = filepath.replace(resource_path("repo_main/examples"), "examples").replace("/", r"\\")
+    838   +        filepath = filepath.replace(
+    839   +            resource_path("repo_main/examples"), "examples"
+    840   +        ).replace("/", r"\\")
+    841            os.startfile(filepath)
+
+• Edited bibliostratus/forms.py (+0 -2)
+    10     import tkinter.ttk as ttk
+    11    -import os
+    11
+    ⋮
+    150            else:
+    152   -            link = os.path.join(os.path.dirname(__file__), link)
+    151                example_ico = tk.Button(
+
+• Explored
+  └ Read bib2id.py
+    Search repo_main in bib2id.py
+
+• Edited bibliostratus/bib2id.py (+0 -1)
+    2744           else:
+    2745  -            link = os.path.join(os.path.dirname(__file__), link)
+    2745               example_ico = tk.Button(
+
+• Explored
+  └ Search repo_main in marc2tables.py
+    Read marc2tables.py
+
+• Edited bibliostratus/marc2tables.py (+11 -5)
+    31     import bibliostratus.forms as forms
+    32    +from bibliostratus._resources import resource_path
+    33
+    ⋮
+    45     prefs = {}
+    45    -try:
+    46    -    with open('repo_main/files/preferences.json', encoding="utf-8") as prefs_file:
+    47    -        prefs = json.load(prefs_file)
+    48    -except FileNotFoundError:
+    49    -    pass
+    46    +for candidate in (
+    47    +    "repo_main/files/preferences.json",
+    48    +    "repo_main/files/preferences.default",
+    49    +):
+    50    +    try:
+    51    +        with open(resource_path(candidate), encoding="utf-8") as prefs_file:
+    52    +            prefs = json.load(prefs_file)
+    53    +        break
+    54    +    except FileNotFoundError:
+    55    +        continue
+    56
+
+• Explored
+  └ Read bib2id_gmb.py
+    Search params_gmb in bib2id_gmb.py
+
+• Edited bibliostratus/bib2id_gmb.py (+3 -3)
+    25     import bibliostratus.funcs as funcs
+    26    +from bibliostratus._resources import resource_path
+    27
+    ⋮
+    219    def load_preferences():
+    219   -    params_gmb_file_name = 'repo_main/files/params_gmb.tsv'
+    220   +    params_gmb_file_name = resource_path("repo_main/files/params_gmb.tsv")
+    221        params_gmb = {"NumNot": -1,
+    ⋮
+    245            print("")
+    245   -        print("Fichier mal formé : repo_main/files/params_gmb.tsv")
+    246   +        print("Fichier mal formé :", params_gmb_file_name)
+    247            print("Corrigez le fichier suivant la documentation et relancez Bibliostratus")
+    ⋮
+    289        return params_gmb
+    289   -
+
+• Explored
+  └ Search repo_main in bib2id_gmb.py
+    Read test_unitaire_bibliostratus.py
+    List main
+
+• Edited bibliostratus/test_unitaire_bibliostratus.py (+4 -2)
+    14
+    15    +from bibliostratus._resources import resource_path
+    16    +
+    17     import bibliostratus.funcs as funcs
+    ⋮
+    370        dirpath = os.path.dirname(os.path.realpath(__file__))
+    369   -    isofile_name = os.path.join(dirpath, "main", "examples", "noticesbib.iso")
+    371   +    isofile_name = resource_path("repo_main/examples/noticesbib.iso")
+    372        liste_files = marc2tables.iso2tables(None, isofile_name, 1, 1, "pytest_iso", display=False)
+    ⋮
+    406    if __name__ == "__main__":
+    405   -  test_convert_iso2tables()
+    407   +  test_convert_iso2tables()
+
+• Explored
+  └ Search repo_main in bibliostratus
+    Search os.path.dirname(__file__) in bibliostratus
+
+• I'm reviewing all Python scripts to confirm we've fully replaced manual path manipulations with resource_path, double-checking imports and usage of os.path
+  and file references, especially in modules like bibliostratus/cli.py and aut2id.py, to ensure cross-platform compatibility and no lingering path-handling
+  issues remain.
+
+• Explored
+  └ Search os\.path in aut2id.py
+    Search os\.path in bibliostratus
+
+• Edited bibliostratus/bib2id_gmb.py (+0 -1)
+    24     import bibliostratus.aut2id as aut2id
+    25    -import bibliostratus.funcs as funcs
+    25     from bibliostratus._resources import resource_path
+
+• Explored
+  └ Read bib2id_gmb.py
+
+• Updated Plan
+  └ ✔ Review path handling in bibliostratus package; identify required updates for resource_path usage and cross-platform support.
+    ✔ Modify modules to route internal file references through resource_path and simplify dev/bundle handling.
+    □ Smoke-check by running targeted commands (e.g., lint/import) and summarize changes.
+
+• Ran python -m compileall bibliostratus
+
+• Updated Plan
+  └ ✔ Review path handling in bibliostratus package; identify required updates for resource_path usage and cross-platform support.
+    ✔ Modify modules to route internal file references through resource_path and simplify dev/bundle handling.
+    ✔ Smoke-check by running targeted commands (e.g., lint/import) and summarize changes.
+
+• Ran git status --short
+
+• Explored
+  └ Read _resources.py, main.py, edit_preferences.py, forms.py, funcs.py, bib2id_gmb.py, bib2id.py, marc2tables.py, test_unitaire_bibliostratus.py
+
+> Updates
+
+  - bibliostratus/_resources.py:8-28 now centralises resource lookup with _base_path() so bundled and dev runs share one resolver and absolute inputs pass
+  through untouched.
+  - bibliostratus/main.py:45-61, 361, 407, 666, 784 replace manual joins with resource_path() for preferences and UI assets, keeping icon/image loading
+  portable.
+  - bibliostratus/funcs.py:52-78, 831-844 load prefs/stop-word files via resource_path() (with absolute fallbacks) and open packaged examples through a single
+  helper.
+  - bibliostratus/forms.py:9-16, 140-160 and bibliostratus/bib2id.py:2720-2754 drop __file__ joins and delegate local example opening to
+  funcs.open_local_file.
+  - bibliostratus/bib2id_gmb.py:218-246, bibliostratus/marc2tables.py:27-55, bibliostratus/edit_preferences.py:198-201, and bibliostratus/
+  test_unitaire_bibliostratus.py:15, 370-372 switch to resource_path() for bundled data access across modules.
+
+  Tests
+
+  - python -m compileall bibliostratus
+
+  Unrelated working-tree changes to .gitignore and tmp_tk.py were left as found. Consider running the PyInstaller build on macOS and Windows to confirm the
+ resource resolver behaves as expected end-to-end.
