@@ -34,6 +34,7 @@ import pymarc as mc
 import bibliostratus.main
 import bibliostratus.marc2tables
 from bibliostratus.udecode import udecode
+from bibliostratus._resources import resource_path
 
 
 # Ajout exception SSL pour éviter
@@ -828,7 +829,7 @@ def open_local_file(path):
     try:
         os.startfile(filepath)
     except FileNotFoundError:
-        filepath = filepath.replace("repo_main/examples", "examples").replace("/", r"\\")
+        filepath = filepath.replace(resource_path("repo_main/examples"), "examples").replace("/", r"\\")
         os.startfile(filepath)
     except AttributeError:
         opener = "open" if sys.platform == "darwin" else "xdg-open"

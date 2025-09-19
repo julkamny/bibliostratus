@@ -1,0 +1,2 @@
+('/Users/octaveboczkowski/Downloads/bibliostratus/bibliostratus/build/Bibliostratus/PYZ-00.pyz',
+ [])

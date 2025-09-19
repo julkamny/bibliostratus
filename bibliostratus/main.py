@@ -32,6 +32,7 @@ import bibliostratus.aut2id as aut2id
 import bibliostratus.bib2id as bib2id
 import bibliostratus.forms as forms
 import bibliostratus.edit_preferences as settings
+from bibliostratus._resources import resource_path
 
 from multiprocessing import freeze_support
 
@@ -663,7 +664,7 @@ def formulaire_main(access_to_network, last_version):
                           bg=couleur_fond, pady=0, padx=0)
     frame_logo.pack(anchor="center")
 
-    logo = tk.PhotoImage(file="repo_main/files/logo_bbs.png")
+    logo = tk.PhotoImage(file=resource_path("repo_main/files/logo_bbs.png"))
     logo = logo.zoom(50) #with 250, I ended up running out of memory
     logo = logo.subsample(50) #mechanically, here it is adjusted to 32 instead of 320
     zone_logo = tk.Label(frame_logo, image=logo, borderwidth=0)
