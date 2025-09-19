@@ -2742,7 +2742,6 @@ def radioButton_lienExample(
                 command=lambda: main.click2url(link),
             )
         else:
-            link = os.path.join(os.path.dirname(__file__), link)
             example_ico = tk.Button(
                 line1,
                 bd=0,

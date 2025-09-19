@@ -10,9 +10,9 @@ les bibliothèques françaises
 """
 
 import codecs
-import os
 import json
 import re
+import os
 #from pkg_resources import py2_warn
 import tkinter as tk
 import webbrowser
@@ -43,23 +43,22 @@ programID = init.programID
 
 # Ajout du fichier preferences.json
 def load_preferences():
-    current_dir = os.path.abspath(__file__)
-    if "/" in current_dir:
-        current_dir = "/".join(current_dir.split("/")[:-1])
-    elif "\\" in current_dir:
-        current_dir = "\\".join(current_dir.split("\\")[:-1])
-    prefs_file_name = os.path.join(current_dir, 'repo_main/files/preferences.json')
-    try:
-        with open(prefs_file_name, encoding="utf-8") as prefs_file:
-            prefs = json.load(prefs_file)
-    except FileNotFoundError:
+    """Load user preferences with a bundled fallback."""
+
+    candidates = [
+        resource_path("repo_main/files/preferences.json"),
+        resource_path("repo_main/files/preferences.default"),
+    ]
+
+    for candidate in candidates:
         try:
-            prefs_file_name = os.path.join(current_dir, 'repo_main/files/preferences.default')
-            with open(prefs_file_name, encoding="utf-8") as prefs_file:
-                prefs = json.load(prefs_file)
+            with open(candidate, encoding="utf-8") as prefs_file:
+                return json.load(prefs_file), candidate
         except FileNotFoundError:
-            prefs = {}
-    return prefs, prefs_file_name
+            continue
+
+    # No preference file was found but keep the expected output path
+    return {}, candidates[0]
 
 
 prefs, prefs_file_name = load_preferences()
@@ -359,7 +358,7 @@ def form_generic_frames(master, title, couleur_fond,
     form.config(padx=10, pady=10, bg=couleur_fond)
     form.title(title)
     try:
-        form.iconbitmap(r'repo_main/files/favicon.ico')
+        form.iconbitmap(resource_path("repo_main/files/favicon.ico"))
     except tk.TclError:
         favicone = "rien"  # noqa
 
@@ -405,7 +404,7 @@ def main_form_frames(title, couleur_fond, couleur_bordure, access_to_network):
     master.config(padx=10, pady=10, bg=couleur_fond)
     master.title(title)
     try:
-        master.iconbitmap(r'repo_main/files/favicon.ico')
+        master.iconbitmap(resource_path("repo_main/files/favicon.ico"))
     except tk.TclError:
         favicone = "rien"  # noqa
 
@@ -782,7 +781,7 @@ def formulaire_main(access_to_network, last_version):
 
     tk.Label(frame_help_cancel, text="\n\nPréférences",
              bg=couleur_fond, font="Arial 8 normal").pack()
-    edit_settings_img = tk.PhotoImage(file='repo_main/files/settings.png')
+    edit_settings_img = tk.PhotoImage(file=resource_path("repo_main/files/settings.png"))
     edit_settings_button = tk.Button(frame_help_cancel,
                                      image=edit_settings_img,
                                      command=lambda: settings.edit_preferences(

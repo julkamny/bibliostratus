@@ -195,7 +195,7 @@ def formulaire_main(prefs_file_name, access_to_network, last_version):
 
 
 if __name__ == "__main__":
-    prefs_file_name = 'repo_main/files/preferences.json'
-    if not(os.path.isfile(prefs_file_name)):
-        prefs_file_name = 'repo_main/files/preferences.default'
+    prefs_file_name = resource_path("repo_main/files/preferences.json")
+    if not os.path.isfile(prefs_file_name):
+        prefs_file_name = resource_path("repo_main/files/preferences.default")
     formulaire_main(prefs_file_name, True, [0, False])

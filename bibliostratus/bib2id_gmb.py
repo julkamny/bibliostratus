@@ -22,7 +22,7 @@ import bibliostratus.forms as forms
 import bibliostratus.main as main
 import bibliostratus.bib2id as bib2id
 import bibliostratus.aut2id as aut2id
-import bibliostratus.funcs as funcs
+from bibliostratus._resources import resource_path
 
 COLS_NAME = ",".join([l for l in ascii_uppercase]) + ","
 COLS_NAME += ",".join([f"A{l}" for l in ascii_uppercase])
@@ -216,7 +216,7 @@ def get_value_of_table(row, nr_of_column):
     return value
 
 def load_preferences():
-    params_gmb_file_name = 'repo_main/files/params_gmb.tsv'
+    params_gmb_file_name = resource_path("repo_main/files/params_gmb.tsv")
     params_gmb = {"NumNot": -1,
                   "FRBNF": "",
                   "ARK": "",
@@ -242,7 +242,7 @@ def load_preferences():
         print("*"*20)
         print(err)
         print("")
-        print("Fichier mal formé : repo_main/files/params_gmb.tsv")
+        print("Fichier mal formé :", params_gmb_file_name)
         print("Corrigez le fichier suivant la documentation et relancez Bibliostratus")
         raise
     return params_gmb
@@ -286,4 +286,3 @@ def launch_gmb_program():
     pprint(params_gmb)
     print("\nSi vous ne l'avez pas édité, veuillez  fermer ce programme et le modifier maintenant\npuis relancez Bibliostratus")
     return params_gmb
-

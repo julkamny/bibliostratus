@@ -8,7 +8,6 @@ Gestion des objets pour les formulaires
 
 import tkinter as tk
 import tkinter.ttk as ttk
-import os
 
 import bibliostratus.main as main 
 import bibliostratus.aut2id as aut2id
@@ -149,7 +148,6 @@ def radioButton_lienExample(
                 command=lambda: main.click2url(link),
             )
         else:
-            link = os.path.join(os.path.dirname(__file__), link)
             example_ico = tk.Button(
                 line1,
                 bd=0,
