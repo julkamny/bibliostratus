@@ -15,8 +15,8 @@ import urllib.error as error
 from collections import defaultdict
 from SPARQLWrapper import SPARQLWrapper, JSON, SPARQLExceptions
 
-import main
-import sru
+import bibliostratus.main as main
+import bibliostratus.sru as sru
 
 def ram2ark_by_accesspoint(input_record, parametres):
     """

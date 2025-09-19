@@ -24,11 +24,11 @@ from random import randrange
 import pymarc as mc
 from unidecode import unidecode
 
-import main
-import funcs
-import bib2id
-import aut2id
-import forms
+import bibliostratus.main as main
+import bibliostratus.funcs as funcs
+import bibliostratus.bib2id as bib2id
+import bibliostratus.aut2id as aut2id
+import bibliostratus.forms as forms
 
 
 # Permet d'écrire dans une liste accessible au niveau général depuis le
@@ -43,7 +43,7 @@ stats = defaultdict(int)
 
 prefs = {}
 try:
-    with open('main/files/preferences.json', encoding="utf-8") as prefs_file:
+    with open('repo_main/files/preferences.json', encoding="utf-8") as prefs_file:
         prefs = json.load(prefs_file)
 except FileNotFoundError:
     pass

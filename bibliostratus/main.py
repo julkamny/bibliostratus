@@ -19,19 +19,19 @@ import webbrowser
 from tkinter import filedialog
 from urllib import error, request
 
-from udecode import udecode
+from bibliostratus.udecode import udecode
 
-import __init__ as init
+import bibliostratus.__init__ as init
 
 NUM_PARALLEL = 20
 
-import ark2records
-import funcs
-import marc2tables
-import aut2id
-import bib2id
-import forms
-import edit_preferences as settings
+import bibliostratus.ark2records as ark2records
+import bibliostratus.funcs as funcs
+import bibliostratus.marc2tables as marc2tables
+import bibliostratus.aut2id as aut2id
+import bibliostratus.bib2id as bib2id
+import bibliostratus.forms as forms
+import bibliostratus.edit_preferences as settings
 
 from multiprocessing import freeze_support
 
@@ -47,13 +47,13 @@ def load_preferences():
         current_dir = "/".join(current_dir.split("/")[:-1])
     elif "\\" in current_dir:
         current_dir = "\\".join(current_dir.split("\\")[:-1])
-    prefs_file_name = os.path.join(current_dir, 'main/files/preferences.json')
+    prefs_file_name = os.path.join(current_dir, 'repo_main/files/preferences.json')
     try:
         with open(prefs_file_name, encoding="utf-8") as prefs_file:
             prefs = json.load(prefs_file)
     except FileNotFoundError:
         try:
-            prefs_file_name = os.path.join(current_dir, 'main/files/preferences.default')
+            prefs_file_name = os.path.join(current_dir, 'repo_main/files/preferences.default')
             with open(prefs_file_name, encoding="utf-8") as prefs_file:
                 prefs = json.load(prefs_file)
         except FileNotFoundError:
@@ -358,7 +358,7 @@ def form_generic_frames(master, title, couleur_fond,
     form.config(padx=10, pady=10, bg=couleur_fond)
     form.title(title)
     try:
-        form.iconbitmap(r'main/files/favicon.ico')
+        form.iconbitmap(r'repo_main/files/favicon.ico')
     except tk.TclError:
         favicone = "rien"  # noqa
 
@@ -404,7 +404,7 @@ def main_form_frames(title, couleur_fond, couleur_bordure, access_to_network):
     master.config(padx=10, pady=10, bg=couleur_fond)
     master.title(title)
     try:
-        master.iconbitmap(r'main/files/favicon.ico')
+        master.iconbitmap(r'repo_main/files/favicon.ico')
     except tk.TclError:
         favicone = "rien"  # noqa
 
@@ -663,7 +663,7 @@ def formulaire_main(access_to_network, last_version):
                           bg=couleur_fond, pady=0, padx=0)
     frame_logo.pack(anchor="center")
 
-    logo = tk.PhotoImage(file="main/files/logo_bbs.png")
+    logo = tk.PhotoImage(file="repo_main/files/logo_bbs.png")
     logo = logo.zoom(50) #with 250, I ended up running out of memory
     logo = logo.subsample(50) #mechanically, here it is adjusted to 32 instead of 320
     zone_logo = tk.Label(frame_logo, image=logo, borderwidth=0)
@@ -781,7 +781,7 @@ def formulaire_main(access_to_network, last_version):
 
     tk.Label(frame_help_cancel, text="\n\nPréférences",
              bg=couleur_fond, font="Arial 8 normal").pack()
-    edit_settings_img = tk.PhotoImage(file='main/files/settings.png')
+    edit_settings_img = tk.PhotoImage(file='repo_main/files/settings.png')
     edit_settings_button = tk.Button(frame_help_cancel,
                                      image=edit_settings_img,
                                      command=lambda: settings.edit_preferences(

@@ -31,9 +31,9 @@ from unidecode import unidecode
 
 import pymarc as mc
 
-import main
-import marc2tables
-from udecode import udecode
+import bibliostratus.main
+import bibliostratus.marc2tables
+from bibliostratus.udecode import udecode
 
 
 # Ajout exception SSL pour éviter
@@ -49,7 +49,7 @@ if (not os.environ.get('PYTHONHTTPSVERIFY', '')
 prefs = {}
 stop_words = []
 try:
-    with open('main/files/preferences.json', encoding="utf-8") as prefs_file:
+    with open('repo_main/files/preferences.json', encoding="utf-8") as prefs_file:
         prefs = json.load(prefs_file)
 except FileNotFoundError:
     pass
@@ -828,7 +828,7 @@ def open_local_file(path):
     try:
         os.startfile(filepath)
     except FileNotFoundError:
-        filepath = filepath.replace("main/examples", "examples").replace("/", r"\\")
+        filepath = filepath.replace("repo_main/examples", "examples").replace("/", r"\\")
         os.startfile(filepath)
     except AttributeError:
         opener = "open" if sys.platform == "darwin" else "xdg-open"

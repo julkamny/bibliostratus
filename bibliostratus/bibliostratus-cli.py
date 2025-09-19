@@ -6,7 +6,7 @@ DEPRECATED
 use instead : cli.py
 """
 
-from cli import *
+from bibliostratus.cli import *
 
 if __name__ == "__main__":
     try:

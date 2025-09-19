@@ -14,9 +14,9 @@ import os, ssl
 from lxml import etree
 import pymarc as mc
 
-import funcs
-import aut2id
-import marc2tables
+import bibliostratus.funcs as funcs
+import bibliostratus.aut2id as aut2id
+import bibliostratus.marc2tables as marc2tables
 
 
 # Ajout exception SSL pour éviter

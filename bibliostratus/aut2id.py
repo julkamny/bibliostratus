@@ -20,12 +20,12 @@ import multiprocessing
 
 from unidecode import unidecode
 
-import funcs
-import main
-import bib2id
-import aut2id_idref
-import aut2id_concepts
-import forms
+import bibliostratus.funcs as funcs
+import bibliostratus.main as main
+import bibliostratus.bib2id as bib2id
+import bibliostratus.aut2id_idref as aut2id_idref
+import bibliostratus.aut2id_concepts as aut2id_concepts
+import bibliostratus.forms as forms
 
 try:
     NUM_PARALLEL = main.NUM_PARALLEL  # Nombre de notices à aligner simultanément

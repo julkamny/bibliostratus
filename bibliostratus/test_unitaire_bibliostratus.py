@@ -12,13 +12,13 @@ import os
 import csv
 import json
 
-import funcs
-import main
-import aut2id_idref
-import bib2id
-import aut2id
-import marc2tables
-import ark2records
+import bibliostratus.funcs as funcs
+import bibliostratus.main as main
+import bibliostratus.aut2id_idref as aut2id_idref
+import bibliostratus.bib2id as bib2id
+import bibliostratus.aut2id as aut2id
+import bibliostratus.marc2tables as marc2tables
+import bibliostratus.ark2records as ark2records
 
 
 # =============================================================================

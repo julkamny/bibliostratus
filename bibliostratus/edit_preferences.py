@@ -7,7 +7,7 @@ import os
 import json
 import tkinter as tk
 
-import main
+import bibliostratus.main as main
 
 def edit_preferences(master_frame, prefs_file_name, access_to_network, last_version):
     couleur_fond = "white"
@@ -59,7 +59,7 @@ def edit_preferences(master_frame, prefs_file_name, access_to_network, last_vers
 
 def reset(prefs_file_name, form):
     try:
-        os.remove("main/files/preferences.json")
+        os.remove("repo_main/files/preferences.json")
     except FileNotFoundError:
         pass
     form.destroy()
@@ -68,7 +68,7 @@ def save_preferences(dic_frames, prefs_file_name, form):
     """
     Enregistrement des nouvelles valeurs dans le fichier des préférences
     """
-    prefs_file_name = "main/files/preferences.json"
+    prefs_file_name = "repo_main/files/preferences.json"
     i = 0
     with open(prefs_file_name, "w", encoding="utf-8") as prefs_file:
         prefs_file.write("{\n")
@@ -194,7 +194,7 @@ def formulaire_main(prefs_file_name, access_to_network, last_version):
 
 
 if __name__ == "__main__":
-    prefs_file_name = 'main/files/preferences.json'
+    prefs_file_name = 'repo_main/files/preferences.json'
     if not(os.path.isfile(prefs_file_name)):
-        prefs_file_name = 'main/files/preferences.default'
+        prefs_file_name = 'repo_main/files/preferences.default'
     formulaire_main(prefs_file_name, True, [0, False])
