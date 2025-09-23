@@ -26,15 +26,15 @@ import multiprocessing
 
 from unidecode import unidecode
 
-import main
-import marc2tables
-import bib2id
-import aut2id
-import ark2records
-import funcs
-import forms
+import bibliostratus.main as main
+import bibliostratus.marc2tables as marc2tables
+import bibliostratus.bib2id as bib2id
+import bibliostratus.aut2id as aut2id
+import bibliostratus.ark2records as ark2records
+import bibliostratus.funcs as funcs
+import bibliostratus.forms as forms
 
-import mapping_number_letters
-import sru
-import udecode
+import bibliostratus.mapping_number_letters as mapping_number_letters
+import bibliostratus.sru as sru
+import bibliostratus.udecode as udecode
 

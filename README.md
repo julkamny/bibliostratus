@@ -1,7 +1,7 @@
 Bibliostratus : STRatégie d'Alignement d'URIs pour la Transition bibliographique
 ==
 
-[![alt Télécharger Bibliostratus : Windows 64 bit - Dernière version](https://raw.githubusercontent.com/Transition-bibliographique/bibliostratus/master/img/bouton_telecharger_bibliostratus.png)](https://github.com/Transition-bibliographique/bibliostratus/raw/master/bin/bibliostratus_latest_win64_py3.6.zip)
+[![alt Télécharger Bibliostratus : Windows 64 bit - Dernière version](https://raw.githubusercontent.com/Transition-bibliographique/bibliostratus/master/img/bouton_telecharger_bibliostratus.png)](https://github.com/Transition-bibliographique/bibliostratus/raw/master/bin/bibliostratus_latest_win64_py3.10.zip)
 
 [Autres configurations](https://github.com/Transition-bibliographique/bibliostratus/tree/master/bin)
 
@@ -18,14 +18,14 @@ Actuellement quatre modules sont en cours de développement, non encore finalis�
 * **Rouge (extraction de notices Marc BnF ou Abes)** : en entrée un fichier listant des ARK BnF, ou des PPN Sudoc/IdRef, afin de récupérer les notices bibliographiques (+option avec notices d'autorité) correspondantes. Le format en sortie est pour l'instant du XML. Il devrait y avoir de l'iso2709 à terme.
 
 
-Objectifs du programme
+## Objectifs du programme
 --
 
 Le présupposé de ce projet est que les bibliothèques doivent, à terme, bénéficier de catalogues contenant des notices conformes au modèle FRBR-LRM. 
 Afin d'éviter qu'elles ne transforment leurs notices de manière indépendantes, ou qu'elles achètent les notices transformées à des fournisseurs (ou pire, qu'elles acquièrent des logiciels qui calculent le regroupement de notices en arbres FRBR à la volée), les agences nationales proposent de faciliter la redistribution de leurs notices.
 Mais pour cela, il faut que chaque bibliothèque ait fait un travail préalable d'*alignement* de son catalogue avec la BnF ou l'Abes, pour que chaque notice d'un catalogue local soit "lié" à la notice du réservoir national (catalogue général BnF ou Sudoc)
 
-Mode d'emploi et tutoriels
+## Mode d'emploi et tutoriels
 --
 * [Voir le wiki](https://github.com/Transition-bibliographique/bibliostratus/wiki "Consulter les pages du wiki sur Github")
 * [Tutoriels vidéo](https://www.transition-bibliographique.fr/systemes-et-donnees/tutoriels-video/)
@@ -34,5 +34,65 @@ Mode d'emploi et tutoriels
 * [Consulter le forum utilisateurs](http://www.agorabib.fr/topic/3317-bibliostratus-mettre-en-correspondance-ses-notices-avec-celles-de-la-bnf/ "topic Agorabib")
 * [Consulter la documentation technique](https://github.com/Transition-bibliographique/bibliostratus/tree/master/doc)
 * [Installer Bibliostratus sur Linux](INSTALL.md)
+
+## Compilation de l'exécutable Windows
+--
+
+Une version précompilée est disponible dans le répertoire [`bin`](bin), mais il est
+parfois nécessaire de générer une nouvelle archive lorsque les dépendances
+évoluent. Le script [`scripts/build_executable.py`](scripts/build_executable.py)
+automatise l'appel à PyInstaller et vérifie que l'interpréteur Python
+utilisé expose bien les bibliothèques Tcl/Tk nécessaires à `tkinter`.
+
+1. Installer Python 3.10 depuis [python.org](https://www.python.org/downloads/),
+   en sélectionnant l'option qui inclut Tcl/Tk.
+2. Installer les dépendances :
+   ```bash
+   uv pip install -r requirements.txt
+   ```
+3. Depuis la racine du dépôt, lancer la compilation :
+   ```bash
+   python scripts/build_executable.py
+   ```
+4. Pour reproduire la chaîne historique (copie des fichiers de configuration et
+   création de l'archive), exécuter ensuite le script batch adapté à votre
+   architecture (`launch_pyinstaller_win64.bat` ou
+   `launch_pyinstaller_win32.bat`). Ces scripts utilisent automatiquement le
+   nouvel utilitaire Python.
+
+En cas d'absence des bibliothèques Tcl/Tk, la compilation est arrêtée avec un
+message explicite plutôt que de produire un exécutable incomplet.
+
+## Compilation de l'exécutable MacOS
+
+Version testée : MacOS Monterey 12.7.6
+
+### Instructions d'installation
+
+- Installer Python 3.10 selon les instructions données ci-dessus.
+- Créer un environnement virtuel et installer les bibliothèques nécessaires : 
+
+```
+/Library/Frameworks/Python.framework/Versions/3.10/bin/python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip wheel
+pip install -r requirements.txt
+```
+
+### Commande depuis bibliostratus/bibliostratus
+
+```
+pyinstaller \
+  main.py \
+  --name Bibliostratus \
+  --windowed \
+  --onedir \
+  --clean \
+  --log-level DEBUG \
+  --debug all \
+  --add-data "repo_main/files:repo_main/files" \
+  --add-data "repo_main/examples:repo_main/examples" \
+  --icon "icons/bibliostratus.icns"
+```
 
 * [Notes de version](bibliostratus/release_notes.md)

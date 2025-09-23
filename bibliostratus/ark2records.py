@@ -24,11 +24,11 @@ import pymarc as mc
 from lxml import etree
 # import smc.bibencodings
 
-import funcs
-import main
-import bib2id
-import forms
-import sru
+import bibliostratus.funcs as funcs
+import bibliostratus.main as main
+import bibliostratus.bib2id as bib2id
+import bibliostratus.forms as forms
+import bibliostratus.sru as sru
 
 
 NUM_PARALLEL = 20    # Nombre de notices à exporter simultanément

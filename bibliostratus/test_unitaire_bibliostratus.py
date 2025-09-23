@@ -12,13 +12,15 @@ import os
 import csv
 import json
 
-import funcs
-import main
-import aut2id_idref
-import bib2id
-import aut2id
-import marc2tables
-import ark2records
+from bibliostratus._resources import resource_path
+
+import bibliostratus.funcs as funcs
+import bibliostratus.main as main
+import bibliostratus.aut2id_idref as aut2id_idref
+import bibliostratus.bib2id as bib2id
+import bibliostratus.aut2id as aut2id
+import bibliostratus.marc2tables as marc2tables
+import bibliostratus.ark2records as ark2records
 
 
 # =============================================================================
@@ -366,7 +368,7 @@ def test_convert_iso2tables():
     Ouverture d'un fichier ISO2709 de notices BIB pour le convertir en fichier tabulé
     """
     dirpath = os.path.dirname(os.path.realpath(__file__))
-    isofile_name = os.path.join(dirpath, "main", "examples", "noticesbib.iso")    
+    isofile_name = resource_path("repo_main/examples/noticesbib.iso")
     liste_files = marc2tables.iso2tables(None, isofile_name, 1, 1, "pytest_iso", display=False)
     for file in liste_files:
         liste_files[file].close()

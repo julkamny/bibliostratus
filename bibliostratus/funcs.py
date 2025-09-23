@@ -31,9 +31,10 @@ from unidecode import unidecode
 
 import pymarc as mc
 
-import main
-import marc2tables
-from udecode import udecode
+import bibliostratus.main
+import bibliostratus.marc2tables
+from bibliostratus.udecode import udecode
+from bibliostratus._resources import resource_path
 
 
 # Ajout exception SSL pour éviter
@@ -48,25 +49,33 @@ if (not os.environ.get('PYTHONHTTPSVERIFY', '')
 # injecter une liste de mots vides
 prefs = {}
 stop_words = []
-try:
-    with open('main/files/preferences.json', encoding="utf-8") as prefs_file:
-        prefs = json.load(prefs_file)
-except FileNotFoundError:
-    pass
+for candidate in (
+    "repo_main/files/preferences.json",
+    "repo_main/files/preferences.default",
+):
+    try:
+        with open(resource_path(candidate), encoding="utf-8") as prefs_file:
+            prefs = json.load(prefs_file)
+        break
+    except FileNotFoundError:
+        continue
 
 if (prefs
     and "stop_words" in prefs
     and "value" in prefs["stop_words"]
     and prefs["stop_words"]["value"]):
-    try:
-        stop_words_file = open(prefs["stop_words"]["value"], "r", encoding="utf-8")
-        for row in stop_words_file:
-            word = row.replace("\r", "").replace("\n", "").split("\t")[0]
-            word = udecode(word.lower())
-            stop_words.append(word)
-        stop_words_file.close()
-    except FileNotFoundError:
-        pass
+    stop_words_locations = [prefs["stop_words"]["value"]]
+    stop_words_locations.append(resource_path(prefs["stop_words"]["value"]))
+    for candidate in stop_words_locations:
+        try:
+            with open(candidate, "r", encoding="utf-8") as stop_words_file:
+                for row in stop_words_file:
+                    word = row.replace("\r", "").replace("\n", "").split("\t")[0]
+                    word = udecode(word.lower())
+                    stop_words.append(word)
+            break
+        except FileNotFoundError:
+            continue
 
 # Quelques listes de signes à nettoyer
 listeChiffres = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
@@ -820,15 +829,15 @@ def id_traitement2path(id_traitement):
 
 
 def open_local_file(path):
-    """Construit le chemin absolu vers un fichier en local
-    Permet d'être correct à la fois en mode "code source"
-    et en version précompilée """
-    dirname = os.path.dirname(__file__)
-    filepath = os.path.join(dirname, path)
+    """Open a bundled resource regardless of execution context."""
+
+    filepath = resource_path(path)
     try:
         os.startfile(filepath)
     except FileNotFoundError:
-        filepath = filepath.replace("main/examples", "examples").replace("/", r"\\")
+        filepath = filepath.replace(
+            resource_path("repo_main/examples"), "examples"
+        ).replace("/", r"\\")
         os.startfile(filepath)
     except AttributeError:
         opener = "open" if sys.platform == "darwin" else "xdg-open"

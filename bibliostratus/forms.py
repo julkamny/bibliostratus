@@ -8,13 +8,12 @@ Gestion des objets pour les formulaires
 
 import tkinter as tk
 import tkinter.ttk as ttk
-import os
 
-import main
-import aut2id
-import ark2records
-import funcs
-
+import bibliostratus.main as main 
+import bibliostratus.aut2id as aut2id
+import bibliostratus.ark2records as ark2records
+import bibliostratus.funcs as funcs
+from bibliostratus._resources import resource_path
 
 url_forum_aide = "http://www.agorabib.fr/topic/3317-bibliostratus-mettre-en-correspondance-ses-notices-avec-celles-de-la-bnf/"  # noqa
 texte_bouton_forum = "Forum\nutilisateurs"
@@ -33,12 +32,12 @@ dict_format_records = {1: "Unimarc",
 ark2records_dict_type_records = {1:
                                 {"line1": "N° de notices bibliographiques",
                                  "line2": "",
-                                 "link": "main/examples/listeARKbib.tsv"
+                                 "link": resource_path("repo_main/examples/listeARKbib.tsv")
                                  },
                                2:
                                 {"line1": "N° de notices d'autorités",
                                  "line2": "",
-                                 "link": "main/examples/listeARKaut.tsv"
+                                 "link": resource_path("repo_main/examples/listeARKaut.tsv")
                                  }
                                 }
 
@@ -49,7 +48,7 @@ ark2records_dict_correct_record_option = {1:
                                           2:
                                             {"line1": "Fichier à 2 colonnes (N° notice local | ARK ou PPN)",
                                              "line2": "pour réécrire les notices récupérées",
-                                             "link": "main/examples/listeARKaut_2cols.tsv"},
+                                             "link": resource_path("repo_main/examples/listeARKaut_2cols.tsv")},
                                              }
 
 # liste_encoding = ["utf-8", "iso-5426", "iso-8859-1"]
@@ -149,7 +148,6 @@ def radioButton_lienExample(
                 command=lambda: main.click2url(link),
             )
         else:
-            link = os.path.join(os.path.dirname(__file__), link)
             example_ico = tk.Button(
                 line1,
                 bd=0,
@@ -432,7 +430,7 @@ header_columns_init_rameau = [
 aut2id_input_data_type = {1:
                             {"line1": "[PERS] Liste de notices Personnes",
                              "line2": display_headers_in_form(header_columns_init_aut2aut),
-                             "link": "main/examples/aut_align_aut.tsv"
+                             "link": resource_path("repo_main/examples/aut_align_aut.tsv")
                                  },
                           2:
                             {"line1": "[ORG] Liste de notices Organisations",
@@ -441,7 +439,7 @@ aut2id_input_data_type = {1:
                           3:
                             {"line1": "Liste de notices bibliographiques",
                              "line2": display_headers_in_form(header_columns_init_bib2aut),
-                             "link": "main/examples/aut_align_bib.tsv"},
+                             "link": resource_path("repo_main/examples/aut_align_bib.tsv")},
                           4:
                             {"line1": "Liste de notices Rameau",
                              "line2": display_headers_in_form(header_columns_init_rameau),
@@ -569,7 +567,7 @@ header_columns_init_partitions = [
 bib2id_type_doc_bib = {1:
                             {"line1": "[TEX] Monographies texte",
                              "line2": display_headers_in_form(header_columns_init_monimpr),
-                             "link": "main/examples/mon_impr.tsv"
+                             "link": resource_path("repo_main/examples/mon_impr.tsv")
                                  },
                           2:
                             {"line1": "[VID] Audiovisuel (DVD)",
@@ -578,11 +576,11 @@ bib2id_type_doc_bib = {1:
                           3:
                             {"line1": "[AUD] Enregistrements sonores",
                              "line2": display_headers_in_form(header_columns_init_cddvd),
-                             "link": "main/examples/audio.tsv"},
+                             "link": resource_path("repo_main/examples/audio.tsv")},
                           4:
                             {"line1": "[PER] Périodiques",
                              "line2": display_headers_in_form(header_columns_init_perimpr),
-                             "link": "main/examples/per.tsv"},
+                             "link": resource_path("repo_main/examples/per.tsv")},
                           5:
                             {"line1": "[CAR] Cartes",
                              "line2": display_headers_in_form(header_columns_init_cartes),
@@ -650,7 +648,7 @@ form_bib2id = {"cadre_input_type_docs_zone":
 marc2tables_file_format = {1:
                             {"line1": "iso2709 encodé UTF-8",
                              "line2": "",
-                             "link": "main/examples/noticesbib.iso"},
+                             "link": resource_path("repo_main/examples/noticesbib.iso")},
                            2:
                             {"line1": "iso2709 encodé ISO-8859-1",
                              "line2": "",

@@ -29,12 +29,12 @@ import json
 from joblib import Parallel, delayed
 import multiprocessing
 
-import funcs
-import main
-import aut2id_idref
-import sru
-import forms
-import bib2id_gmb
+import bibliostratus.funcs as funcs
+import bibliostratus.main as main
+import bibliostratus.aut2id_idref as aut2id_idref
+import bibliostratus.sru as sru
+import bibliostratus.forms as forms
+import bibliostratus.bib2id_gmb as bib2id_gmb
 
 # Ajout exception SSL pour éviter
 # plantages en interrogeant les API IdRef
@@ -2742,7 +2742,6 @@ def radioButton_lienExample(
                 command=lambda: main.click2url(link),
             )
         else:
-            link = os.path.join(os.path.dirname(__file__), link)
             example_ico = tk.Button(
                 line1,
                 bd=0,

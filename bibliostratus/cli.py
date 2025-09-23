@@ -27,11 +27,11 @@ python cli.py --action ark2records --file main\examples\listeARKbib.tsv --record
 import sys
 import argparse
 
-import main
-import marc2tables
-import bib2id
-import aut2id
-import ark2records
+import bibliostratus.main as main
+import bibliostratus.marc2tables as marc2tables
+import bibliostratus.bib2id as bib2id
+import bibliostratus.aut2id as aut2id
+import bibliostratus.ark2records as ark2records
 
 
 
